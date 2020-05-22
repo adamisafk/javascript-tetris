@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const scoreDisplay = document.querySelector('#score')
     const startBtn = document.querySelector('#start-button')
     const width = 10 // width means the size of the total board. its a 10x20
+    let nextRandom = 0
 
     // Tetrominoes - each shape has 4 rotations which are represented by a multi-dim array.
     const lTetromino = [
@@ -39,18 +40,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const theTetrominoes = [lTetromino, zTetromino, tTetromino, oTetromino, iTetromino]
     
-    let currentPosition // sets the position
-    let currentRotation // and rotation
-    let current // current tetromino
-    let random // current randomized tetromino index
-
+    let currentPosition = 4 // sets the position
+    let currentRotation = 0 // and rotation
+    let random = Math.floor(Math.random()*theTetrominoes.length) // sets random index for tetromino
+    let current = theTetrominoes[random][currentRotation] // current tetromino
+    
     selectTetromino()
 
     // Select Tetromino
     function selectTetromino() {
       currentRotation = 0
       // randomly select a Tetromino and its first rotation
-      random = Math.floor(Math.random()*theTetrominoes.length)
+      random = nextRandom
+      nextRandom = Math.floor(Math.random()*theTetrominoes.length)
       current = theTetrominoes[random][currentRotation]
       currentPosition = 4
       draw()
@@ -107,6 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
         current.forEach(index => squares[currentPosition + index].classList.add('taken')) // denotes that the square has been taken by a tetromino
         // start a new tetromino falling
         selectTetromino()
+        displayShape()
       }
     }
 
@@ -158,5 +161,36 @@ document.addEventListener('DOMContentLoaded', () => {
       current = theTetrominoes[random][currentRotation]
       draw()
     }
+
+
+
+
+
+
+  //show up-next tetromino in mini-grid display
+  const displaySquares = document.querySelectorAll('.sidebar .mini-grid div')
+  const displayWidth = 4
+  const displayIndex = 0
+
+
+  //the Tetrominos without rotations
+  const upNextTetrominoes = [
+    [1, displayWidth+1, displayWidth*2+1, 2], //lTetromino
+    [0, displayWidth, displayWidth+1, displayWidth*2+1], //zTetromino
+    [1, displayWidth, displayWidth+1, displayWidth+2], //tTetromino
+    [0, 1, displayWidth, displayWidth+1], //oTetromino
+    [1, displayWidth+1, displayWidth*2+1, displayWidth*3+1] //iTetromino
+  ]
+
+  //display the shape in the mini-grid display
+  function displayShape() {
+    //remove any trace of a tetromino form the entire grid
+    displaySquares.forEach(square => {
+      square.classList.remove('tetromino')
+    })
+    upNextTetrominoes[nextRandom].forEach( index => {
+      displaySquares[displayIndex + index].classList.add('tetromino')
+    })
+  }
 
 })
