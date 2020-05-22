@@ -4,8 +4,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const scoreDisplay = document.querySelector('#score')
     const startBtn = document.querySelector('#start-button')
     const width = 10 // width means the size of the total board. its a 10x20
-    let nextRandom = 0
     let gameTick = null
+    let score = 0
+    let gameHasNotEnded = true
 
     // Tetrominoes - each shape has 4 rotations which are represented by a multi-dim array.
     const lTetromino = [
@@ -44,6 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentPosition = 4 // sets the position
     let currentRotation = 0 // and rotation
     let random = Math.floor(Math.random()*theTetrominoes.length) // sets random index for tetromino
+    let nextRandom = Math.floor(Math.random()*theTetrominoes.length)
     let current = theTetrominoes[random][currentRotation] // current tetromino
     
     selectTetromino()
@@ -75,19 +77,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // controls - functions are assigned to keycodes
     function control(e) {
-      switch(e.keyCode) {
-        case 37: // left arrow
-          moveLeft()
-          break;
-        case 38: // up arrow
-          rotate()
-          break;
-        case 39: // right arrow
-          moveRight()
-          break;
-        case 40: // down arrow
-          gameLoop()
-          break;
+      if (gameHasNotEnded = true) {
+        switch(e.keyCode) {
+          case 37: // left arrow
+            moveLeft()
+            break;
+          case 38: // up arrow
+            rotate()
+            break;
+          case 39: // right arrow
+            moveRight()
+            break;
+          case 40: // down arrow
+            gameLoop()
+            break;
+        }
       }
     }
 
@@ -108,6 +112,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // start a new tetromino falling
         selectTetromino()
         displayShape()
+        addScore()
+        gameOver()
       }
     }
 
@@ -149,15 +155,55 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Rotate a Tetromino
     function rotate() {
-      undraw() // delete
-      currentRotation++ // increases the current rotation index
-      // if the rotation is at maximum index (index 3 because there are four rotations), wrap it around to 0
-      if(currentRotation === current.length) {
-        currentRotation = 0
+      const isAtLeftEdge = current.some(index => (currentPosition + index) % width === 0);
+      const isAtRightEdge = current.some(index => (currentPosition + index) % width === (width - 1));
+
+      if (!(isAtLeftEdge | isAtRightEdge)) {
+        undraw() // delete
+        currentRotation++ // increases the current rotation index
+        // if the rotation is at maximum index (index 3 because there are four rotations), wrap it around to 0
+        if(currentRotation === current.length) {
+          currentRotation = 0
+        }
+        // select the new rotation of the current tetromino, without updating the current position
+        current = theTetrominoes[random][currentRotation]
       }
-      // select the new rotation of the current tetromino, without updating the current position
-      current = theTetrominoes[random][currentRotation]
       draw()
+    }
+
+    // Add score when row is filled
+    function addScore() {
+      for (let i = 0; i < 199; i += width) { // loops through each square on the board
+        const row = [i, i+1, i+2, i+3, i+4, i+5, i+6, i+7, i+8, i+9] // define a row
+        if (row.every(index => squares[index].classList.contains('taken'))) { // if every square in the defined row is taken...
+          // add and update score
+          score +=10
+          scoreDisplay.innerHTML = score
+          //remove row's taken class and styling
+          row.forEach(index => {
+            squares[index].classList.remove('taken')
+            squares[index].classList.remove('tetromino')
+          })
+          // remove row
+          const squaresRemoved = squares.splice(i, width) // splices the square starting from the current loop index to the edge (full width)
+          squares = squaresRemoved.concat(squares) // combine array
+          squares.forEach(cell => grid.appendChild(cell))
+          // add a new row
+        }
+      }
+    }
+
+    // Game ends when height is filled
+    function gameOver() {
+      if (current.some(index => squares[currentPosition + index].classList.contains('taken'))) {
+        document.querySelector('#end').innerHTML = 'END'
+        clearInterval(gameTick)
+        gameHasNotEnded = false
+      }
+    }
+    // Flashing tetromino to show game is over
+    function flashTetromino() {
+      //if (document.)
     }
 
 
