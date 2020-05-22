@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const startBtn = document.querySelector('#start-button')
     const width = 10 // width means the size of the total board. its a 10x20
     let nextRandom = 0
+    let gameTick = null
 
     // Tetrominoes - each shape has 4 rotations which are represented by a multi-dim array.
     const lTetromino = [
@@ -71,9 +72,6 @@ document.addEventListener('DOMContentLoaded', () => {
         squares[currentPosition + index].classList.remove('tetromino')
       })
     }
-
-    // a game loop will occur ever 1 seconds
-    gameTick = setInterval(gameLoop, 1000)
 
     // controls - functions are assigned to keycodes
     function control(e) {
@@ -163,6 +161,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
+    // Button Event Listener
+    startBtn.addEventListener('click', () => {
+      if (gameTick) {
+        startBtn.innerHTML = 'Resume'
+        clearInterval(gameTick)
+        gameTick = null
+      } else {
+        startBtn.innerHTML = 'Pause' // button text is paused
+        draw()
+        gameTick = setInterval(gameLoop, 1000) // each game tick is 1 second, each tick calls the game loop which moves it down
+        nextRandom = Math.floor(Math.random()*theTetrominoes.length) // set the next random tetromino index
+        displayShape() // show next tetromino in mini grid
+      }
+    })
 
 
 
