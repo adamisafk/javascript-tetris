@@ -42,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentPosition // sets the position
     let currentRotation // and rotation
     let current // current tetromino
+    let random // current randomized tetromino index
 
     selectTetromino()
 
@@ -49,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function selectTetromino() {
       currentRotation = 0
       // randomly select a Tetromino and its first rotation
-      let random = Math.floor(Math.random()*theTetrominoes.length)
+      random = Math.floor(Math.random()*theTetrominoes.length)
       current = theTetrominoes[random][currentRotation]
       currentPosition = 4
       draw()
@@ -79,13 +80,13 @@ document.addEventListener('DOMContentLoaded', () => {
           moveLeft()
           break;
         case 38: // up arrow
-          //rotate
+          rotate()
           break;
         case 39: // right arrow
           moveRight()
           break;
         case 40: // down arrow
-          //moveDown()
+          gameLoop()
           break;
       }
     }
@@ -143,6 +144,19 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       draw() //update
+    }
+
+    // Rotate a Tetromino
+    function rotate() {
+      undraw() // delete
+      currentRotation++ // increases the current rotation index
+      // if the rotation is at maximum index (index 3 because there are four rotations), wrap it around to 0
+      if(currentRotation === current.length) {
+        currentRotation = 0
+      }
+      // select the new rotation of the current tetromino, without updating the current position
+      current = theTetrominoes[random][currentRotation]
+      draw()
     }
 
 })
