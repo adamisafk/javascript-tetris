@@ -1,3 +1,5 @@
+// RULEBOOK: https://tetris.fandom.com/wiki/Tetris_Guideline
+
 document.addEventListener('DOMContentLoaded', () => {
     const grid = document.querySelector('.grid')
     let squares = Array.from(document.querySelectorAll('.grid div'))
@@ -6,7 +8,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const width = 10 // width means the size of the total board. its a 10x20
     let gameTick = null
     let score = 0
-    let gameHasNotEnded = true
+    const colours = [ //colours must be defined in order of the tetrominos
+      'orange', 'red', 'purple', 'yellow', 'cyan'
+    ]
 
     // Tetrominoes - each shape has 4 rotations which are represented by a multi-dim array.
     const lTetromino = [
@@ -65,6 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function draw() {
         current.forEach(index => {
             squares[currentPosition + index].classList.add('tetromino')
+            squares[currentPosition + index].style.backgroundColor = colours[random]
         })
     }
 
@@ -72,6 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function undraw () {
       current.forEach(index => {
         squares[currentPosition + index].classList.remove('tetromino')
+        squares[currentPosition + index].style.backgroundColor = ''
       })
     }
 
@@ -183,6 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
           row.forEach(index => {
             squares[index].classList.remove('taken')
             squares[index].classList.remove('tetromino')
+            squares[index].style.backgroundColor = ''
           })
           // remove row
           const squaresRemoved = squares.splice(i, width) // splices the square starting from the current loop index to the edge (full width)
@@ -245,9 +252,11 @@ document.addEventListener('DOMContentLoaded', () => {
     //remove any trace of a tetromino form the entire grid
     displaySquares.forEach(square => {
       square.classList.remove('tetromino')
+      square.style.backgroundColor = ''
     })
     upNextTetrominoes[nextRandom].forEach( index => {
       displaySquares[displayIndex + index].classList.add('tetromino')
+      displaySquares[displayIndex + index].style.backgroundColor = colours[nextRandom]
     })
   }
 
